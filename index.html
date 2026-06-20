@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RC 비행기 조종법 및 미션 수행 | 코리아사이언스</title>
+<style>
+  :root{
+    --sky:#2f80ed;
+    --sky-dark:#1c5fbf;
+    --ground:#2fa86a;
+    --air:#8a63d2;
+    --bg:#f3f7fc;
+    --card:#ffffff;
+    --text:#1f2937;
+    --muted:#667085;
+    --line:#e4eaf2;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:"Pretendard","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* ===== Header ===== */
+  header{
+    position:relative;
+    background:linear-gradient(135deg,var(--sky) 0%,var(--sky-dark) 100%);
+    color:#fff;
+    padding:40px 18px 34px;
+    text-align:center;
+  }
+  .brand{
+    display:inline-block;
+    font-size:13px;font-weight:800;letter-spacing:1px;
+    background:rgba(255,255,255,.18);
+    padding:6px 16px;border-radius:999px;margin-bottom:14px;
+  }
+  header h1{font-size:clamp(22px,5.2vw,38px);font-weight:800;letter-spacing:-.5px}
+  header p{font-size:clamp(14px,2.6vw,18px);opacity:.92;margin-top:8px;font-weight:500}
+  .hero{
+    max-width:560px;
+    margin:24px auto 0;
+    border-radius:18px;
+    overflow:hidden;
+    box-shadow:0 18px 40px rgba(28,95,191,.35);
+    background:#fff;
+  }
+  .hero img{width:100%;display:block}
+
+  /* ===== Tabs (big menu boxes) ===== */
+  .tabs{
+    position:sticky;top:0;z-index:20;
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:10px;
+    max-width:1080px;margin:0 auto;
+    background:rgba(243,247,252,.94);
+    backdrop-filter:blur(8px);
+    padding:14px 14px;
+    border-bottom:1px solid var(--line);
+  }
+  .tab{
+    border:2.5px solid var(--line);
+    background:#fff;
+    color:var(--muted);
+    font-size:clamp(15px,2.4vw,21px);font-weight:800;
+    padding:18px 8px;border-radius:16px;
+    cursor:pointer;transition:.15s;
+    box-shadow:0 3px 8px rgba(0,0,0,.05);
+    line-height:1.3;
+  }
+  .tab:hover{transform:translateY(-2px)}
+  .tab.active{color:#fff;border-color:transparent}
+  .tab[data-color="basic"].active{background:var(--sky)}
+  .tab[data-color="ground"].active{background:var(--ground)}
+  .tab[data-color="air"].active{background:var(--air)}
+
+  /* ===== Sections ===== */
+  main{max-width:1080px;margin:0 auto;padding:26px 16px 50px}
+  .panel{display:none;animation:fade .25s ease}
+  .panel.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+  .section-title{
+    display:flex;align-items:center;gap:10px;
+    font-size:clamp(20px,4vw,24px);font-weight:800;margin:6px 0 18px;
+  }
+  .dot{width:14px;height:14px;border-radius:50%}
+  .dot.basic{background:var(--sky)}
+  .dot.ground{background:var(--ground)}
+  .dot.air{background:var(--air)}
+
+  /* guidance banner */
+  .guide{
+    display:flex;gap:16px;align-items:center;flex-wrap:wrap;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-left:6px solid var(--ground);
+    border-radius:14px;
+    padding:14px;margin-bottom:24px;
+    box-shadow:0 4px 14px rgba(0,0,0,.04);
+  }
+  .guide.air{border-left-color:var(--air)}
+  .guide img{
+    width:210px;max-width:46vw;border-radius:10px;flex-shrink:0;display:block;
+  }
+  .guide .g-text{flex:1;min-width:200px}
+  .guide .g-label{
+    display:inline-block;font-size:12.5px;font-weight:800;color:#fff;
+    background:var(--ground);padding:4px 12px;border-radius:999px;margin-bottom:7px;
+  }
+  .guide.air .g-label{background:var(--air)}
+  .guide .g-text p{font-size:clamp(15px,2.6vw,17px);font-weight:600;color:var(--text)}
+
+  /* ===== Video grid ===== */
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+    gap:18px;
+  }
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:14px;overflow:hidden;
+    box-shadow:0 4px 14px rgba(0,0,0,.05);
+    transition:.15s;
+  }
+  .card:hover{transform:translateY(-3px);box-shadow:0 10px 24px rgba(0,0,0,.1)}
+  .thumb{
+    position:relative;aspect-ratio:16/9;cursor:pointer;
+    background-size:cover;background-position:center;
+    background-color:#dbe6f3;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .thumb::before{
+    content:"";position:absolute;inset:0;
+    background:rgba(0,0,0,.18);transition:.15s;
+  }
+  .thumb:hover::before{background:rgba(0,0,0,.06)}
+  .play{
+    position:relative;z-index:2;
+    width:66px;height:66px;border-radius:50%;
+    background:rgba(255,255,255,.94);
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 6px 18px rgba(0,0,0,.3);transition:.15s;
+  }
+  .thumb:hover .play{transform:scale(1.08)}
+  .play::after{
+    content:"";display:block;
+    border-left:21px solid var(--sky);
+    border-top:13px solid transparent;
+    border-bottom:13px solid transparent;
+    margin-left:5px;
+  }
+  .panel[data-color="ground"] .play::after{border-left-color:var(--ground)}
+  .panel[data-color="air"] .play::after{border-left-color:var(--air)}
+  .num{
+    position:absolute;top:10px;left:10px;z-index:2;
+    min-width:30px;height:30px;padding:0 8px;border-radius:999px;
+    background:rgba(31,41,55,.82);color:#fff;
+    font-size:14px;font-weight:800;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .thumb iframe{position:absolute;inset:0;width:100%;height:100%;border:0;z-index:3}
+  .card .label{
+    padding:13px 15px;font-size:clamp(15px,2.6vw,16px);font-weight:700;
+  }
+
+  footer{
+    text-align:center;color:var(--muted);font-size:13px;padding:26px 16px;
+    border-top:1px solid var(--line);
+  }
+  footer strong{color:var(--text)}
+
+  /* ===== Mobile ===== */
+  @media (max-width:560px){
+    .tabs{gap:7px;padding:12px 10px}
+    .tab{padding:14px 4px;border-radius:13px}
+    .grid{grid-template-columns:1fr;gap:14px}
+    .guide{flex-direction:column;text-align:center}
+    .guide img{width:100%;max-width:340px}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <span class="brand">코리아사이언스</span>
+  <h1>RC 비행기 조종법 및 미션 수행</h1>
+  <p>미션을 통해 RC 비행기 조종법을 익혀보자</p>
+  <div class="hero">
+    <img src="RC 비행기 전체모습.jpg" alt="RC 비행기 전체모습">
+  </div>
+</header>
+
+<nav class="tabs">
+  <button class="tab active" data-color="basic" data-target="basic">조종법<br>기초 배우기</button>
+  <button class="tab" data-color="ground" data-target="ground">지상조종<br>미션</button>
+  <button class="tab" data-color="air" data-target="air">비행 미션<br>조종법</button>
+</nav>
+
+<main>
+
+  <!-- ===== 조종법 기초 배우기 ===== -->
+  <section class="panel active" id="basic" data-color="basic">
+    <h2 class="section-title"><span class="dot basic"></span>조종법 기초 배우기</h2>
+    <div class="grid">
+      <div class="card"><div class="thumb" data-id="1202958670" data-h="00687b08b4" style="background-image:url('https://i.vimeocdn.com/video/2170842228-bc1c2007d4b73ae3f357351973775fbe61fded9ffd678deaf259e53822390abf-d_640')"><span class="num">1</span><div class="play"></div></div><div class="label">페어링하는 법</div></div>
+      <div class="card"><div class="thumb" data-id="1202958677" data-h="9865c90596" style="background-image:url('https://i.vimeocdn.com/video/2170842306-11338fdaefd2c810b89742f3326b029f8bd92427f1a4ef82158acb3b47aa8777-d_640')"><span class="num">2</span><div class="play"></div></div><div class="label">좌우 쏠림 조종법</div></div>
+    </div>
+  </section>
+
+  <!-- ===== 지상조종 미션 ===== -->
+  <section class="panel" id="ground" data-color="ground">
+    <h2 class="section-title"><span class="dot ground"></span>지상조종 미션</h2>
+    <div class="guide">
+      <img src="지상_날개 아래로.jpg" alt="수평꼬리날개를 아래로">
+      <div class="g-text">
+        <span class="g-label">지상 미션 준비</span>
+        <p>자동차 미션을 수행할 때는 <strong>수평꼬리날개를 아래로 내려주세요.</strong></p>
+      </div>
+    </div>
+    <div class="grid">
+      <div class="card"><div class="thumb" data-id="1202958603" data-h="e8887255b0" style="background-image:url('https://i.vimeocdn.com/video/2170842100-aa5df9b80b28d8f70f0c78ca8dd0a272e7fd9a02a8553c7c8efcaee02e49dff6-d_640')"><span class="num">1</span><div class="play"></div></div><div class="label">자동차 직진 조종법</div></div>
+      <div class="card"><div class="thumb" data-id="1202958649" data-h="bc55b80cb5" style="background-image:url('https://i.vimeocdn.com/video/2170842176-d15cac9472b81c6bc28044265d43372cccfcd8114ba8da0acd7d5b5ae58b4947-d_640')"><span class="num">2</span><div class="play"></div></div><div class="label">자동차 왕복주행 조종법</div></div>
+      <div class="card"><div class="thumb" data-id="1202958606" data-h="5702f033f3" style="background-image:url('https://i.vimeocdn.com/video/2170842097-f2464d0e1d026332196acfd60e968d7b9559f2a8c327d425bbe261a564c06bc9-d_640')"><span class="num">3</span><div class="play"></div></div><div class="label">자동차 지그재그 가기 조종법</div></div>
+      <div class="card"><div class="thumb" data-id="1202958637" data-h="9046545a42" style="background-image:url('https://i.vimeocdn.com/video/2170842156-cacee943f7425d74555026dbbe7a6c294b3a57e2edaa927d8beea710b63ac6eb-d_640')"><span class="num">4</span><div class="play"></div></div><div class="label">자동차 지그재그 오기 조종법</div></div>
+      <div class="card"><div class="thumb" data-id="1202958559" data-h="ad283b91b6" style="background-image:url('https://i.vimeocdn.com/video/2170842043-1d7dff06410cfa2ef557917f90a82b47e5337040eeef0a02269f9e7ac73819e7-d_640')"><span class="num">5</span><div class="play"></div></div><div class="label">자동차 왕복 지그재그 조종법</div></div>
+      <div class="card"><div class="thumb" data-id="1202958562" data-h="f19be71276" style="background-image:url('https://i.vimeocdn.com/video/2170842042-d26cd7386687fd01b615dec92f9442b311e3b7951f3660efc962c5b08f944322-d_640')"><span class="num">6</span><div class="play"></div></div><div class="label">자동차 제자리 회전 조종법</div></div>
+    </div>
+  </section>
+
+  <!-- ===== 비행 미션 조종법 ===== -->
+  <section class="panel" id="air" data-color="air">
+    <h2 class="section-title"><span class="dot air"></span>비행 미션 조종법</h2>
+    <div class="guide air">
+      <img src="비행_날개 약간 위쪽으로.jpg" alt="수평꼬리날개를 약간 위로">
+      <div class="g-text">
+        <span class="g-label">비행 미션 준비</span>
+        <p>비행 미션을 수행할 때는 <strong>날개를 약간 위쪽으로 올려서</strong> 비행해주세요.</p>
+      </div>
+    </div>
+    <div class="grid">
+      <div class="card"><div class="thumb" data-id="1202961705" data-h="ae28af0243" style="background-image:url('https://i.vimeocdn.com/video/2170846471-51f13296414d11c92352d4b074815abf4eb623fa9974437fa6baacdddf2430d9-d_640')"><span class="num">1</span><div class="play"></div></div><div class="label">직진 비행</div></div>
+      <div class="card"><div class="thumb" data-id="1202958560" data-h="c4a0a23d9d" style="background-image:url('https://i.vimeocdn.com/video/2170842035-d2d92d834e762be6f80c4213ef83180f94983d24c1a5dbca6cab7017e91fa7cf-d_640')"><span class="num">2</span><div class="play"></div></div><div class="label">오른쪽 회전 비행 조종법</div></div>
+      <div class="card"><div class="thumb" data-id="1202958561" data-h="5792043b4c" style="background-image:url('https://i.vimeocdn.com/video/2170842031-7eea7f696a79ce79617325381de4df5a8c6854aee731fccf8a58c31d778e0c19-d_640')"><span class="num">3</span><div class="play"></div></div><div class="label">왼쪽 회전 비행 조종법</div></div>
+      <div class="card"><div class="thumb" data-id="1202958675" data-h="c9397eb0f1" style="background-image:url('https://i.vimeocdn.com/video/2170842245-8fc0be3a766b0bfed39731fd2b4576179a9593f406bfa3e3ac3c67f369bcb029-d_640')"><span class="num">4</span><div class="play"></div></div><div class="label">자유 비행 조종법</div></div>
+      <div class="card"><div class="thumb" data-id="1202958595" data-h="b689fe756d" style="background-image:url('https://i.vimeocdn.com/video/2170842130-5c7bd97afca80cf1cf274ee9fa005f1b4edae673bebf7ea8e627f4f074ad9f07-d_640')"><span class="num">5</span><div class="play"></div></div><div class="label">자유 비행 6분 (배속 조정)</div></div>
+    </div>
+  </section>
+
+</main>
+
+<footer>© <strong>코리아사이언스</strong> · RC 비행기 조종법 및 미션 수행 · 학습용 자료</footer>
+
+<script>
+  // 탭 전환
+  document.querySelectorAll('.tab').forEach(function(tab){
+    tab.addEventListener('click', function(){
+      document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active')});
+      document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active')});
+      tab.classList.add('active');
+      document.getElementById(tab.dataset.target).classList.add('active');
+      window.scrollTo({top:0,behavior:'smooth'});
+    });
+  });
+
+  // 썸네일 클릭 시 Vimeo 영상 로드
+  document.querySelectorAll('.thumb').forEach(function(thumb){
+    thumb.addEventListener('click', function(){
+      if(thumb.dataset.loaded) return;
+      thumb.dataset.loaded = '1';
+      var id = thumb.dataset.id, h = thumb.dataset.h;
+      var iframe = document.createElement('iframe');
+      iframe.src = 'https://player.vimeo.com/video/'+id+'?h='+h+'&autoplay=1&title=0&byline=0&portrait=0';
+      iframe.allow = 'autoplay; fullscreen; picture-in-picture';
+      iframe.setAttribute('allowfullscreen','');
+      thumb.innerHTML = '';
+      thumb.appendChild(iframe);
+    });
+  });
+</script>
+
+</body>
+</html>
