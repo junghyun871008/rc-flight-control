@@ -107,7 +107,32 @@
   .guide.air{border-left-color:var(--air)}
   .guide img{
     width:210px;max-width:46vw;border-radius:10px;flex-shrink:0;display:block;
+    cursor:zoom-in;transition:.15s;
   }
+  .guide img:hover{filter:brightness(1.03);box-shadow:0 6px 18px rgba(0,0,0,.18)}
+  .zoom-hint{
+    display:inline-block;margin-top:8px;font-size:12.5px;color:var(--muted);font-weight:600;
+  }
+
+  /* ===== Lightbox (이미지 확대) ===== */
+  .lightbox{
+    position:fixed;inset:0;z-index:100;
+    background:rgba(0,0,0,.88);
+    display:none;align-items:center;justify-content:center;
+    padding:24px;cursor:zoom-out;
+  }
+  .lightbox.open{display:flex;animation:fade .2s ease}
+  .lightbox img{
+    max-width:100%;max-height:90vh;
+    border-radius:10px;box-shadow:0 20px 60px rgba(0,0,0,.5);
+  }
+  .lightbox .close{
+    position:absolute;top:18px;right:22px;
+    width:46px;height:46px;border-radius:50%;
+    background:rgba(255,255,255,.18);color:#fff;
+    border:0;font-size:26px;line-height:1;cursor:pointer;
+  }
+  .lightbox .close:hover{background:rgba(255,255,255,.32)}
   .guide .g-text{flex:1;min-width:200px}
   .guide .g-label{
     display:inline-block;font-size:12.5px;font-weight:800;color:#fff;
@@ -199,7 +224,7 @@
 
 <nav class="tabs">
   <button class="tab active" data-color="basic" data-target="basic">조종법<br>기초 배우기</button>
-  <button class="tab" data-color="ground" data-target="ground">지상조종<br>미션</button>
+  <button class="tab" data-color="ground" data-target="ground">지상미션<br>조종법</button>
   <button class="tab" data-color="air" data-target="air">비행 미션<br>조종법</button>
 </nav>
 
@@ -216,12 +241,13 @@
 
   <!-- ===== 지상조종 미션 ===== -->
   <section class="panel" id="ground" data-color="ground">
-    <h2 class="section-title"><span class="dot ground"></span>지상조종 미션</h2>
+    <h2 class="section-title"><span class="dot ground"></span>지상미션 조종법</h2>
     <div class="guide">
-      <img src="지상_날개 아래로.jpg" alt="수평꼬리날개를 아래로">
+      <img class="zoomable" src="지상_날개 아래로.jpg" alt="수평꼬리날개를 아래로">
       <div class="g-text">
         <span class="g-label">지상 미션 준비</span>
         <p>자동차 미션을 수행할 때는 <strong>수평꼬리날개를 아래로 내려주세요.</strong></p>
+        <span class="zoom-hint">🔍 이미지를 클릭하면 크게 볼 수 있어요</span>
       </div>
     </div>
     <div class="grid">
@@ -238,10 +264,11 @@
   <section class="panel" id="air" data-color="air">
     <h2 class="section-title"><span class="dot air"></span>비행 미션 조종법</h2>
     <div class="guide air">
-      <img src="비행_날개 약간 위쪽으로.jpg" alt="수평꼬리날개를 약간 위로">
+      <img class="zoomable" src="비행_날개 약간 위쪽으로.jpg" alt="수평꼬리날개를 약간 위로">
       <div class="g-text">
         <span class="g-label">비행 미션 준비</span>
-        <p>비행 미션을 수행할 때는 <strong>날개를 약간 위쪽으로 올려서</strong> 비행해주세요.</p>
+        <p>비행 미션을 수행할 때는 <strong>수평꼬리 날개를 약간 위쪽으로 올려서</strong> 비행해주세요.</p>
+        <span class="zoom-hint">🔍 이미지를 클릭하면 크게 볼 수 있어요</span>
       </div>
     </div>
     <div class="grid">
@@ -257,6 +284,12 @@
 
 <footer>© <strong>코리아사이언스</strong> · RC 비행기 조종법 및 미션 수행 · 학습용 자료</footer>
 
+<!-- 이미지 확대 라이트박스 -->
+<div class="lightbox" id="lightbox">
+  <button class="close" aria-label="닫기">&times;</button>
+  <img id="lightbox-img" src="" alt="확대 이미지">
+</div>
+
 <script>
   // 탭 전환
   document.querySelectorAll('.tab').forEach(function(tab){
@@ -268,6 +301,19 @@
       window.scrollTo({top:0,behavior:'smooth'});
     });
   });
+
+  // 안내 이미지 클릭 시 확대 (라이트박스)
+  var lightbox = document.getElementById('lightbox');
+  var lightboxImg = document.getElementById('lightbox-img');
+  document.querySelectorAll('.zoomable').forEach(function(img){
+    img.addEventListener('click', function(){
+      lightboxImg.src = img.src;
+      lightbox.classList.add('open');
+    });
+  });
+  function closeLightbox(){ lightbox.classList.remove('open'); lightboxImg.src=''; }
+  lightbox.addEventListener('click', closeLightbox);
+  document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeLightbox(); });
 
   // 썸네일 클릭 시 Vimeo 영상 로드
   document.querySelectorAll('.thumb').forEach(function(thumb){
