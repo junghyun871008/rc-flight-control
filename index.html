@@ -133,6 +133,35 @@
     border:0;font-size:26px;line-height:1;cursor:pointer;
   }
   .lightbox .close:hover{background:rgba(255,255,255,.32)}
+
+  /* ===== Video modal (영상 크게 보기) ===== */
+  .vmodal{
+    position:fixed;inset:0;z-index:110;
+    background:rgba(0,0,0,.9);
+    display:none;align-items:center;justify-content:center;
+    padding:24px;
+  }
+  .vmodal.open{display:flex;animation:fade .2s ease}
+  .vmodal .vbox{
+    position:relative;width:min(960px,92vw);
+  }
+  .vmodal .vtitle{
+    color:#fff;font-size:clamp(15px,2.6vw,18px);font-weight:700;
+    margin-bottom:10px;padding-right:50px;
+  }
+  .vmodal .vframe{
+    position:relative;width:100%;aspect-ratio:16/9;
+    background:#000;border-radius:12px;overflow:hidden;
+    box-shadow:0 20px 60px rgba(0,0,0,.55);
+  }
+  .vmodal .vframe iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+  .vmodal .close{
+    position:absolute;top:-6px;right:0;
+    width:46px;height:46px;border-radius:50%;
+    background:rgba(255,255,255,.18);color:#fff;
+    border:0;font-size:26px;line-height:1;cursor:pointer;z-index:2;
+  }
+  .vmodal .close:hover{background:rgba(255,255,255,.32)}
   .guide .g-text{flex:1;min-width:200px}
   .guide .g-label{
     display:inline-block;font-size:12.5px;font-weight:800;color:#fff;
@@ -284,6 +313,15 @@
 
 <footer>© <strong>코리아사이언스</strong> · RC 비행기 조종법 및 미션 수행 · 학습용 자료</footer>
 
+<!-- 영상 크게 보기 모달 -->
+<div class="vmodal" id="vmodal">
+  <div class="vbox">
+    <button class="close" id="vclose" aria-label="닫기">&times;</button>
+    <div class="vtitle" id="vtitle"></div>
+    <div class="vframe" id="vframe"></div>
+  </div>
+</div>
+
 <!-- 이미지 확대 라이트박스 -->
 <div class="lightbox" id="lightbox">
   <button class="close" aria-label="닫기">&times;</button>
@@ -315,20 +353,28 @@
   lightbox.addEventListener('click', closeLightbox);
   document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeLightbox(); });
 
-  // 썸네일 클릭 시 Vimeo 영상 로드
+  // 썸네일 클릭 시 큰 모달 창으로 Vimeo 영상 재생
+  var vmodal = document.getElementById('vmodal');
+  var vframe = document.getElementById('vframe');
+  var vtitle = document.getElementById('vtitle');
   document.querySelectorAll('.thumb').forEach(function(thumb){
     thumb.addEventListener('click', function(){
-      if(thumb.dataset.loaded) return;
-      thumb.dataset.loaded = '1';
       var id = thumb.dataset.id, h = thumb.dataset.h;
+      var label = thumb.parentElement.querySelector('.label');
+      vtitle.textContent = label ? label.textContent : '';
       var iframe = document.createElement('iframe');
       iframe.src = 'https://player.vimeo.com/video/'+id+'?h='+h+'&autoplay=1&title=0&byline=0&portrait=0';
       iframe.allow = 'autoplay; fullscreen; picture-in-picture';
       iframe.setAttribute('allowfullscreen','');
-      thumb.innerHTML = '';
-      thumb.appendChild(iframe);
+      vframe.innerHTML = '';
+      vframe.appendChild(iframe);
+      vmodal.classList.add('open');
     });
   });
+  function closeVideo(){ vmodal.classList.remove('open'); vframe.innerHTML=''; }
+  document.getElementById('vclose').addEventListener('click', closeVideo);
+  vmodal.addEventListener('click', function(e){ if(e.target===vmodal) closeVideo(); });
+  document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeVideo(); });
 </script>
 
 </body>
